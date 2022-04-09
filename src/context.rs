@@ -1,12 +1,13 @@
 use crate::{
     Buffer, BufferKind, BufferLayout, BufferUsage, PassAction, Pipeline, PipelineInternal, Shader,
-    VertexAttribute,
+    VertexAttribute, Uniform, UniformFormat,
 };
 
 use glow::{Framebuffer, HasContext};
 use std::cell::RefCell;
 use std::mem;
 use std::rc::Rc;
+use std::slice;
 
 pub(crate) struct ContextState {
     pub pipelines: Vec<PipelineInternal>,
@@ -69,8 +70,8 @@ impl Context {
         Pipeline::new(self, shader, buffers, attrs)
     }
 
-    pub fn create_shader(&self, vert_source: impl AsRef<[u8]>, frag_source: impl AsRef<[u8]>) -> Shader {
-        Shader::new(self, vert_source, frag_source)
+    pub fn create_shader(&self, vert_source: impl AsRef<[u8]>, frag_source: impl AsRef<[u8]>, uniforms: &[Uniform]) -> Shader {
+        Shader::new(self, vert_source, frag_source, uniforms)
     }
 
     pub fn set_pipeline(&self, pipeline: &Pipeline) {
@@ -105,6 +106,69 @@ impl Context {
                     );
                     self.inner
                         .vertex_attrib_divisor(attr.location, attr.divisor);
+                }
+            }
+        }
+    }
+
+    pub fn set_uniforms<T>(&self, data: T) {
+        let pipeline = &self.state.borrow().pipelines[self.state.borrow().curr_pipeline.unwrap()];
+        let shader = &pipeline.shader;
+
+        unsafe {
+            self.inner.use_program(Some(shader.inner));
+        }
+
+        let mut ptr = &data as *const T as *const std::ffi::c_void;
+        for uniform in &shader.uniforms {
+            match uniform.format {
+                UniformFormat::Float1 => {
+                    unsafe {
+                        self.inner.uniform_1_f32_slice(Some(&uniform.location), slice::from_raw_parts(ptr.cast(), 1));
+                        ptr = ptr.offset(mem::size_of::<f32>() as isize);
+                    }
+                }
+                UniformFormat::Float2 => {
+                    unsafe {
+                        self.inner.uniform_2_f32_slice(Some(&uniform.location), slice::from_raw_parts(ptr.cast(), 2));
+                        ptr = ptr.offset(mem::size_of::<[f32; 2]>() as isize);
+                    }
+                }
+                UniformFormat::Float3 => {
+                    unsafe {
+                        self.inner.uniform_3_f32_slice(Some(&uniform.location), slice::from_raw_parts(ptr.cast(), 3));
+                        ptr = ptr.offset(mem::size_of::<[f32; 3]>() as isize);
+                    }
+                }
+                UniformFormat::Float4 => {
+                    unsafe {
+                        self.inner.uniform_4_f32_slice(Some(&uniform.location), slice::from_raw_parts(ptr.cast(), 4));
+                        ptr = ptr.offset(mem::size_of::<[f32; 4]>() as isize);
+                    }
+                }
+                UniformFormat::Int1 => {
+                    unsafe {
+                        self.inner.uniform_1_i32_slice(Some(&uniform.location), slice::from_raw_parts(ptr.cast(), 1));
+                        ptr = ptr.offset(mem::size_of::<i32>() as isize);
+                    }
+                }
+                UniformFormat::Int2 => {
+                    unsafe {
+                        self.inner.uniform_2_i32_slice(Some(&uniform.location), slice::from_raw_parts(ptr.cast(), 2));
+                        ptr = ptr.offset(mem::size_of::<[i32; 2]>() as isize);
+                    }
+                }
+                UniformFormat::Int3 => {
+                    unsafe {
+                        self.inner.uniform_3_i32_slice(Some(&uniform.location), slice::from_raw_parts(ptr.cast(), 3));
+                        ptr = ptr.offset(mem::size_of::<[i32; 3]>() as isize);
+                    }
+                }
+                UniformFormat::Int4 => {
+                    unsafe {
+                        self.inner.uniform_4_i32_slice(Some(&uniform.location), slice::from_raw_parts(ptr.cast(), 4));
+                        ptr = ptr.offset(mem::size_of::<[i32; 4]>() as isize);
+                    }
                 }
             }
         }

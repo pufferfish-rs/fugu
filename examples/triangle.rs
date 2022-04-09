@@ -1,6 +1,7 @@
 use fugu::*;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
+use std::time::Instant;
 
 #[repr(C)]
 struct Vertex {
@@ -46,18 +47,27 @@ pub fn main() -> Result<(), String> {
     let vert_source = r"
         #version 330
 
+        uniform float time;
+
         in vec2 pos;
         in vec3 color;
 
         out vec3 vert_color;
 
         void main() {
-            gl_Position = vec4(pos.x, pos.y, 0.0, 1.0);
+            gl_Position = vec4(pos.x + sin(time * 2.5) * 0.2, pos.y + sin(time * 5.0) * 0.1, 0.0, 1.0);
             vert_color = color;
         }
     ";
 
-    let shader = ctx.create_shader(vert_source, frag_source);
+    let shader = ctx.create_shader(
+        vert_source,
+        frag_source,
+        &[Uniform {
+            name: "time",
+            format: UniformFormat::Float1,
+        }],
+    );
 
     let pipeline = ctx.create_pipeline(
         shader,
@@ -93,6 +103,8 @@ pub fn main() -> Result<(), String> {
 
     let buffer = ctx.create_buffer_with_data(BufferKind::Vertex, BufferUsage::Static, verts);
 
+    let start_time = Instant::now();
+
     'running: loop {
         for event in event_pump.poll_iter() {
             match event {
@@ -113,6 +125,7 @@ pub fn main() -> Result<(), String> {
 
         ctx.set_pipeline(&pipeline);
         ctx.set_vertex_buffer(&buffer);
+        ctx.set_uniforms(start_time.elapsed().as_secs_f32());
 
         ctx.draw(0, 3, 1);
 
