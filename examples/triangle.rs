@@ -1,4 +1,5 @@
 use fugu::*;
+use image::EncodableLayout;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use std::time::Instant;
@@ -7,6 +8,7 @@ use std::time::Instant;
 struct Vertex {
     pos: (f32, f32),
     color: (f32, f32, f32),
+    tex_coord: (f32, f32),
 }
 
 pub fn main() -> Result<(), String> {
@@ -35,12 +37,15 @@ pub fn main() -> Result<(), String> {
     let frag_source = r"
         #version 330
 
+        uniform sampler2D tex;
+
         in vec3 vert_color;
+        in vec2 vert_tex_coord;
 
         out vec4 out_color;
 
         void main() {
-            out_color = vec4(vert_color, 1.0);
+            out_color = vec4(vert_color, 1.0) * texture(tex, vert_tex_coord);
         }
     ";
 
@@ -51,12 +56,15 @@ pub fn main() -> Result<(), String> {
 
         in vec2 pos;
         in vec3 color;
+        in vec2 tex_coord;
 
         out vec3 vert_color;
+        out vec2 vert_tex_coord;
 
         void main() {
             gl_Position = vec4(pos.x + sin(time * 2.5) * 0.2, pos.y + sin(time * 5.0) * 0.1, 0.0, 1.0);
             vert_color = color;
+            vert_tex_coord = tex_coord;
         }
     ";
 
@@ -67,6 +75,7 @@ pub fn main() -> Result<(), String> {
             name: "time",
             format: UniformFormat::Float1,
         }],
+        &[ImageUniform { name: "tex" }],
     );
 
     let pipeline = ctx.create_pipeline(
@@ -83,6 +92,11 @@ pub fn main() -> Result<(), String> {
                 format: VertexFormat::Float3,
                 buffer_index: 0,
             },
+            VertexAttribute {
+                name: "tex_coord",
+                format: VertexFormat::Float2,
+                buffer_index: 0,
+            },
         ],
     );
 
@@ -90,18 +104,28 @@ pub fn main() -> Result<(), String> {
         Vertex {
             pos: (-0.5, -0.5),
             color: (1., 0., 0.),
+            tex_coord: (0., 0.),
         },
         Vertex {
             pos: (0.5, -0.5),
             color: (0., 1., 0.),
+            tex_coord: (1., 0.),
         },
         Vertex {
             pos: (0.5, 0.5),
             color: (0., 0., 1.),
+            tex_coord: (1., 1.),
         },
     ];
 
     let buffer = ctx.create_buffer_with_data(BufferKind::Vertex, BufferUsage::Static, verts);
+
+    let pattern_tex = {
+        let image = image::load_from_memory(include_bytes!("pattern.png")).unwrap();
+        let data = image.to_rgba8();
+        let (width, height) = data.dimensions();
+        ctx.create_image_with_data(width, height, ImageFormat::Rgba8, ImageFilter::Linear, ImageWrap::Repeat, data.as_bytes())
+    };
 
     let start_time = Instant::now();
 
@@ -126,6 +150,7 @@ pub fn main() -> Result<(), String> {
         ctx.set_pipeline(&pipeline);
         ctx.set_vertex_buffer(&buffer);
         ctx.set_uniforms(start_time.elapsed().as_secs_f32());
+        ctx.set_images(&[&pattern_tex]);
 
         ctx.draw(0, 3, 1);
 

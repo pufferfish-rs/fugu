@@ -6,6 +6,7 @@ use std::str;
 pub struct Shader {
     pub(crate) inner: glow::Program,
     pub(crate) uniforms: Vec<UniformInternal>,
+    pub(crate) image_uniforms: Vec<ImageUniformInternal>,
     ctx: Rc<glow::Context>,
 }
 
@@ -17,6 +18,14 @@ pub struct Uniform {
 pub(crate) struct UniformInternal {
     pub location: glow::UniformLocation,
     pub format: UniformFormat,
+}
+
+pub struct ImageUniform {
+    pub name: &'static str,
+}
+
+pub(crate) struct ImageUniformInternal {
+    pub location: glow::UniformLocation,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -32,7 +41,7 @@ pub enum UniformFormat {
 }
 
 impl Shader {
-    pub(crate) fn new(ctx: &Context, vert_source: impl AsRef<[u8]>, frag_source: impl AsRef<[u8]>, uniforms: &[Uniform]) -> Self {
+    pub(crate) fn new(ctx: &Context, vert_source: impl AsRef<[u8]>, frag_source: impl AsRef<[u8]>, uniforms: &[Uniform], images: &[ImageUniform]) -> Self {
         let inner = unsafe {
             let program = ctx.inner.create_program().unwrap();
 
@@ -66,9 +75,17 @@ impl Shader {
             })
             .collect();
 
+        let image_uniforms = images
+            .iter()
+            .map(|image_uniform| ImageUniformInternal {
+                location: unsafe { ctx.inner.get_uniform_location(inner, image_uniform.name).unwrap() },
+            })
+            .collect();
+
         Self {
             inner,
             uniforms,
+            image_uniforms,
             ctx: ctx.inner.clone(),
         }
     }
