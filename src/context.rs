@@ -1,17 +1,21 @@
-use super::{Buffer, PassAction, Pipeline, PipelineInternal};
+use crate::{
+    Buffer, BufferKind, BufferLayout, BufferUsage, PassAction, Pipeline, PipelineInternal, Shader,
+    VertexAttribute,
+};
+
 use glow::{Framebuffer, HasContext};
 use std::cell::RefCell;
 use std::mem;
 use std::rc::Rc;
 
-pub(super) struct ContextState {
+pub(crate) struct ContextState {
     pub pipelines: Vec<PipelineInternal>,
     pub curr_pipeline: Option<usize>,
 }
 
 pub struct Context {
-    pub(super) inner: Rc<glow::Context>,
-    pub(super) state: Rc<RefCell<ContextState>>,
+    pub(crate) inner: Rc<glow::Context>,
+    pub(crate) state: Rc<RefCell<ContextState>>,
     default_framebuffer: Framebuffer,
     // TODO: should we cache GL state?
 }
@@ -41,6 +45,32 @@ impl Context {
             default_framebuffer,
             state,
         }
+    }
+
+    pub fn create_buffer(&self, kind: BufferKind, usage: BufferUsage, size: usize) -> Buffer {
+        Buffer::new(self, kind, usage, size)
+    }
+
+    pub fn create_buffer_with_data<T>(
+        &self,
+        kind: BufferKind,
+        usage: BufferUsage,
+        data: &[T],
+    ) -> Buffer {
+        Buffer::with_data(self, kind, usage, data)
+    }
+
+    pub fn create_pipeline(
+        &self,
+        shader: Shader,
+        buffers: &[BufferLayout],
+        attrs: &[VertexAttribute],
+    ) -> Pipeline {
+        Pipeline::new(self, shader, buffers, attrs)
+    }
+
+    pub fn create_shader(&self, vert_source: impl AsRef<[u8]>, frag_source: impl AsRef<[u8]>) -> Shader {
+        Shader::new(self, vert_source, frag_source)
     }
 
     pub fn set_pipeline(&self, pipeline: &Pipeline) {

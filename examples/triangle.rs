@@ -57,10 +57,9 @@ pub fn main() -> Result<(), String> {
         }
     ";
 
-    let shader = Shader::new(&ctx, vert_source.as_bytes(), frag_source.as_bytes());
+    let shader = ctx.create_shader(vert_source, frag_source);
 
-    let pipeline = Pipeline::new(
-        &ctx,
+    let pipeline = ctx.create_pipeline(
         shader,
         &[BufferLayout::default()],
         &[
@@ -92,7 +91,7 @@ pub fn main() -> Result<(), String> {
         },
     ];
 
-    let buffer = Buffer::with_data(&ctx, BufferKind::Vertex, BufferUsage::Static, verts);
+    let buffer = ctx.create_buffer_with_data(BufferKind::Vertex, BufferUsage::Static, verts);
 
     'running: loop {
         for event in event_pump.poll_iter() {

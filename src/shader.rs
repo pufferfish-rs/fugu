@@ -4,20 +4,20 @@ use std::rc::Rc;
 use std::str;
 
 pub struct Shader {
-    pub(super) inner: glow::Program,
+    pub(crate) inner: glow::Program,
     ctx: Rc<glow::Context>,
 }
 
 impl Shader {
-    pub fn new(ctx: &Context, vert_source: &[u8], frag_source: &[u8]) -> Self {
+    pub(crate) fn new(ctx: &Context, vert_source: impl AsRef<[u8]>, frag_source: impl AsRef<[u8]>) -> Self {
         let inner = unsafe {
             let program = ctx.inner.create_program().unwrap();
 
             let vert = ctx.inner.create_shader(glow::VERTEX_SHADER).unwrap();
             let frag = ctx.inner.create_shader(glow::FRAGMENT_SHADER).unwrap();
 
-            ctx.inner.shader_source(vert, str::from_utf8(vert_source).unwrap());
-            ctx.inner.shader_source(frag, str::from_utf8(frag_source).unwrap());
+            ctx.inner.shader_source(vert, str::from_utf8(vert_source.as_ref()).unwrap());
+            ctx.inner.shader_source(frag, str::from_utf8(frag_source.as_ref()).unwrap());
 
             ctx.inner.compile_shader(vert);
             ctx.inner.compile_shader(frag);

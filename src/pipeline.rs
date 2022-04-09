@@ -43,7 +43,7 @@ pub struct VertexAttribute {
 }
 
 #[derive(Clone)]
-pub(super) struct VertexAttributeInternal {
+pub(crate) struct VertexAttributeInternal {
     pub location: u32,
     pub format: u32,
     pub offset: i32,
@@ -54,16 +54,16 @@ pub(super) struct VertexAttributeInternal {
 
 #[derive(Clone, Copy, Debug)]
 pub struct Pipeline {
-    pub(super) id: usize,
+    pub(crate) id: usize,
 }
 
 pub struct PipelineInternal {
-    pub(super) attrs: Vec<Vec<VertexAttributeInternal>>,
-    pub(super) shader: Shader,
+    pub(crate) attrs: Vec<Vec<VertexAttributeInternal>>,
+    pub(crate) shader: Shader,
 }
 
 impl Pipeline {
-    pub fn new(
+    pub(crate) fn new(
         ctx: &Context,
         shader: Shader,
         buffers: &[BufferLayout],

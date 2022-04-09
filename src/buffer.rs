@@ -16,14 +16,14 @@ pub enum BufferUsage {
 }
 
 pub struct Buffer {
-    pub(super) inner: glow::Buffer,
-    pub(super) kind: BufferKind,
+    pub(crate) inner: glow::Buffer,
+    pub(crate) kind: BufferKind,
     size: usize,
     ctx: Rc<glow::Context>,
 }
 
 impl Buffer {
-    pub fn new(ctx: &Context, kind: BufferKind, usage: BufferUsage, size: usize) -> Self {
+    pub(crate) fn new(ctx: &Context, kind: BufferKind, usage: BufferUsage, size: usize) -> Self {
         assert_ne!(
             usage,
             BufferUsage::Static,
@@ -55,7 +55,7 @@ impl Buffer {
         }
     }
 
-    pub fn with_data<T>(ctx: &Context, kind: BufferKind, usage: BufferUsage, data: &[T]) -> Self {
+    pub(crate) fn with_data<T>(ctx: &Context, kind: BufferKind, usage: BufferUsage, data: &[T]) -> Self {
         let target = match kind {
             BufferKind::Vertex => glow::ARRAY_BUFFER,
             BufferKind::Index => glow::ELEMENT_ARRAY_BUFFER,
