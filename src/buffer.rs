@@ -55,7 +55,12 @@ impl Buffer {
         }
     }
 
-    pub(crate) fn with_data<T>(ctx: &Context, kind: BufferKind, usage: BufferUsage, data: &[T]) -> Self {
+    pub(crate) fn with_data<T>(
+        ctx: &Context,
+        kind: BufferKind,
+        usage: BufferUsage,
+        data: &[T],
+    ) -> Self {
         let target = match kind {
             BufferKind::Vertex => glow::ARRAY_BUFFER,
             BufferKind::Index => glow::ELEMENT_ARRAY_BUFFER,

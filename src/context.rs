@@ -225,8 +225,10 @@ impl Context {
         for (i, image_uniform) in shader.image_uniforms.iter().enumerate() {
             unsafe {
                 self.inner.active_texture(glow::TEXTURE0 + i as u32);
-                self.inner.bind_texture(glow::TEXTURE_2D, Some(images[i].inner));
-                self.inner.uniform_1_i32(Some(&image_uniform.location), i as i32);
+                self.inner
+                    .bind_texture(glow::TEXTURE_2D, Some(images[i].inner));
+                self.inner
+                    .uniform_1_i32(Some(&image_uniform.location), i as i32);
             }
         }
     }

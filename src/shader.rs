@@ -41,15 +41,23 @@ pub enum UniformFormat {
 }
 
 impl Shader {
-    pub(crate) fn new(ctx: &Context, vert_source: impl AsRef<[u8]>, frag_source: impl AsRef<[u8]>, uniforms: &[Uniform], images: &[ImageUniform]) -> Self {
+    pub(crate) fn new(
+        ctx: &Context,
+        vert_source: impl AsRef<[u8]>,
+        frag_source: impl AsRef<[u8]>,
+        uniforms: &[Uniform],
+        images: &[ImageUniform],
+    ) -> Self {
         let inner = unsafe {
             let program = ctx.inner.create_program().unwrap();
 
             let vert = ctx.inner.create_shader(glow::VERTEX_SHADER).unwrap();
             let frag = ctx.inner.create_shader(glow::FRAGMENT_SHADER).unwrap();
 
-            ctx.inner.shader_source(vert, str::from_utf8(vert_source.as_ref()).unwrap());
-            ctx.inner.shader_source(frag, str::from_utf8(frag_source.as_ref()).unwrap());
+            ctx.inner
+                .shader_source(vert, str::from_utf8(vert_source.as_ref()).unwrap());
+            ctx.inner
+                .shader_source(frag, str::from_utf8(frag_source.as_ref()).unwrap());
 
             ctx.inner.compile_shader(vert);
             ctx.inner.compile_shader(frag);
@@ -78,7 +86,11 @@ impl Shader {
         let image_uniforms = images
             .iter()
             .map(|image_uniform| ImageUniformInternal {
-                location: unsafe { ctx.inner.get_uniform_location(inner, image_uniform.name).unwrap() },
+                location: unsafe {
+                    ctx.inner
+                        .get_uniform_location(inner, image_uniform.name)
+                        .unwrap()
+                },
             })
             .collect();
 
