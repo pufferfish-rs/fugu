@@ -1,6 +1,7 @@
 use crate::{
-    Buffer, BufferKind, BufferLayout, BufferUsage, Image, ImageFilter, ImageFormat, ImageWrap,
-    PassAction, Pipeline, PipelineInternal, Shader, Uniform, UniformFormat, VertexAttribute, ImageUniform,
+    Buffer, BufferKind, BufferLayout, BufferUsage, Image, ImageFilter, ImageFormat, ImageUniform,
+    ImageWrap, PassAction, Pipeline, PipelineInternal, Shader, Uniform, UniformFormat,
+    VertexAttribute,
 };
 
 use glow::{Framebuffer, HasContext};
@@ -12,6 +13,7 @@ use std::slice;
 pub(crate) struct ContextState {
     pub pipelines: Vec<PipelineInternal>,
     pub curr_pipeline: Option<usize>,
+    pub idx_buffer_set: bool,
 }
 
 pub struct Context {
@@ -39,6 +41,7 @@ impl Context {
         let state = Rc::new(RefCell::new(ContextState {
             pipelines: Vec::new(),
             curr_pipeline: None,
+            idx_buffer_set: false,
         }));
 
         Self {
@@ -140,6 +143,14 @@ impl Context {
         }
     }
 
+    pub fn set_index_buffer(&self, buffer: &Buffer) {
+        unsafe {
+            self.inner
+                .bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(buffer.inner));
+        }
+        self.state.borrow_mut().idx_buffer_set = true;
+    }
+
     pub fn set_uniforms<T>(&self, data: T) {
         let pipeline = &self.state.borrow().pipelines[self.state.borrow().curr_pipeline.unwrap()];
         let shader = &pipeline.shader;
@@ -220,14 +231,24 @@ impl Context {
         }
     }
 
-    pub fn draw(&self, start: usize, vertices: usize, instances: usize) {
+    pub fn draw(&self, start: usize, count: usize, instances: usize) {
         unsafe {
-            self.inner.draw_arrays_instanced(
-                glow::TRIANGLES,
-                start as _,
-                vertices as _,
-                instances as _,
-            );
+            if self.state.borrow().idx_buffer_set {
+                self.inner.draw_elements_instanced(
+                    glow::TRIANGLES,
+                    count as _,
+                    glow::UNSIGNED_SHORT,
+                    start as _,
+                    instances as _,
+                );
+            } else {
+                self.inner.draw_arrays_instanced(
+                    glow::TRIANGLES,
+                    start as _,
+                    count as _,
+                    instances as _,
+                );
+            }
         }
     }
 
@@ -270,6 +291,9 @@ impl Context {
             self.inner.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, None);
             // TODO: clear texture bindings?
         }
+
+        self.state.borrow_mut().curr_pipeline = None;
+        self.state.borrow_mut().idx_buffer_set = false;
     }
 
     pub fn set_viewport(&self, x: u32, y: u32, width: u32, height: u32) {
