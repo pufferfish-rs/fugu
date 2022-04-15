@@ -1,8 +1,10 @@
-use super::Context;
 use alloc::rc::Rc;
 use alloc::slice;
 use core::mem;
+
 use glow::HasContext;
+
+use super::Context;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BufferKind {

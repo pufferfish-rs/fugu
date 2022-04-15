@@ -1,7 +1,9 @@
-use super::{Context, Shader};
 use alloc::vec;
 use alloc::vec::Vec;
+
 use glow::HasContext;
+
+use super::{Context, Shader};
 
 #[derive(Clone, Copy, Debug)]
 pub enum VertexStep {

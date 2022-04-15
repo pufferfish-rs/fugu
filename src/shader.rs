@@ -1,8 +1,10 @@
-use super::Context;
 use alloc::rc::Rc;
 use alloc::vec::Vec;
 use core::str;
+
 use glow::HasContext;
+
+use super::Context;
 
 pub struct Shader {
     pub(crate) inner: glow::Program,

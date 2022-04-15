@@ -1,5 +1,6 @@
-use crate::Context;
 use glow::HasContext;
+
+use crate::Context;
 
 pub struct Image {
     pub(crate) inner: glow::Texture,

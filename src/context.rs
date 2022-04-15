@@ -1,15 +1,16 @@
-use crate::{
-    Buffer, BufferKind, BufferLayout, BufferUsage, Image, ImageFilter, ImageFormat, ImageUniform,
-    ImageWrap, PassAction, Pipeline, PipelineInternal, Shader, Uniform, UniformFormat,
-    VertexAttribute,
-};
-
 use alloc::rc::Rc;
 use alloc::slice;
 use alloc::vec::Vec;
 use core::cell::RefCell;
 use core::{ffi, mem};
+
 use glow::{Framebuffer, HasContext};
+
+use crate::{
+    Buffer, BufferKind, BufferLayout, BufferUsage, Image, ImageFilter, ImageFormat, ImageUniform,
+    ImageWrap, PassAction, Pipeline, PipelineInternal, Shader, Uniform, UniformFormat,
+    VertexAttribute,
+};
 
 pub(crate) struct ContextState {
     pub pipelines: Vec<PipelineInternal>,

@@ -1,10 +1,11 @@
+use std::time::Instant;
+
 use fugu::*;
 use glutin::event::{Event, WindowEvent};
 use glutin::event_loop::{ControlFlow, EventLoop};
 use glutin::window::WindowBuilder;
 use glutin::ContextBuilder;
 use image::EncodableLayout;
-use std::time::Instant;
 
 #[repr(C)]
 struct Vertex {
