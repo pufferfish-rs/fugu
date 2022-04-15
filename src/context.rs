@@ -4,11 +4,12 @@ use crate::{
     VertexAttribute,
 };
 
+use alloc::rc::Rc;
+use alloc::slice;
+use alloc::vec::Vec;
+use core::cell::RefCell;
+use core::{ffi, mem};
 use glow::{Framebuffer, HasContext};
-use std::cell::RefCell;
-use std::mem;
-use std::rc::Rc;
-use std::slice;
 
 pub(crate) struct ContextState {
     pub pipelines: Vec<PipelineInternal>,
@@ -26,7 +27,7 @@ pub struct Context {
 impl Context {
     pub fn new<F>(loader_function: F) -> Self
     where
-        F: FnMut(&str) -> *const std::ffi::c_void,
+        F: FnMut(&str) -> *const ffi::c_void,
     {
         let inner = Rc::new(unsafe { glow::Context::from_loader_function(loader_function) });
         unsafe {
@@ -155,7 +156,7 @@ impl Context {
         let pipeline = &self.state.borrow().pipelines[self.state.borrow().curr_pipeline.unwrap()];
         let shader = &pipeline.shader;
 
-        let mut ptr = &data as *const T as *const std::ffi::c_void;
+        let mut ptr = &data as *const T as *const ffi::c_void;
         for uniform in &shader.uniforms {
             match uniform.format {
                 UniformFormat::Float1 => unsafe {

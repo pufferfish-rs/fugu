@@ -1,4 +1,6 @@
 use super::{Context, Shader};
+use alloc::vec;
+use alloc::vec::Vec;
 use glow::HasContext;
 
 #[derive(Clone, Copy, Debug)]
