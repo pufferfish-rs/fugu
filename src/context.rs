@@ -165,56 +165,56 @@ impl Context {
                         Some(&uniform.location),
                         slice::from_raw_parts(ptr.cast(), 1),
                     );
-                    ptr = ptr.offset(mem::size_of::<f32>() as isize);
+                    ptr = ptr.add(mem::size_of::<f32>());
                 },
                 UniformFormat::Float2 => unsafe {
                     self.inner.uniform_2_f32_slice(
                         Some(&uniform.location),
                         slice::from_raw_parts(ptr.cast(), 2),
                     );
-                    ptr = ptr.offset(mem::size_of::<[f32; 2]>() as isize);
+                    ptr = ptr.add(mem::size_of::<[f32; 2]>());
                 },
                 UniformFormat::Float3 => unsafe {
                     self.inner.uniform_3_f32_slice(
                         Some(&uniform.location),
                         slice::from_raw_parts(ptr.cast(), 3),
                     );
-                    ptr = ptr.offset(mem::size_of::<[f32; 3]>() as isize);
+                    ptr = ptr.add(mem::size_of::<[f32; 3]>());
                 },
                 UniformFormat::Float4 => unsafe {
                     self.inner.uniform_4_f32_slice(
                         Some(&uniform.location),
                         slice::from_raw_parts(ptr.cast(), 4),
                     );
-                    ptr = ptr.offset(mem::size_of::<[f32; 4]>() as isize);
+                    ptr = ptr.add(mem::size_of::<[f32; 4]>());
                 },
                 UniformFormat::Int1 => unsafe {
                     self.inner.uniform_1_i32_slice(
                         Some(&uniform.location),
                         slice::from_raw_parts(ptr.cast(), 1),
                     );
-                    ptr = ptr.offset(mem::size_of::<i32>() as isize);
+                    ptr = ptr.add(mem::size_of::<i32>());
                 },
                 UniformFormat::Int2 => unsafe {
                     self.inner.uniform_2_i32_slice(
                         Some(&uniform.location),
                         slice::from_raw_parts(ptr.cast(), 2),
                     );
-                    ptr = ptr.offset(mem::size_of::<[i32; 2]>() as isize);
+                    ptr = ptr.add(mem::size_of::<[i32; 2]>());
                 },
                 UniformFormat::Int3 => unsafe {
                     self.inner.uniform_3_i32_slice(
                         Some(&uniform.location),
                         slice::from_raw_parts(ptr.cast(), 3),
                     );
-                    ptr = ptr.offset(mem::size_of::<[i32; 3]>() as isize);
+                    ptr = ptr.add(mem::size_of::<[i32; 3]>());
                 },
                 UniformFormat::Int4 => unsafe {
                     self.inner.uniform_4_i32_slice(
                         Some(&uniform.location),
                         slice::from_raw_parts(ptr.cast(), 4),
                     );
-                    ptr = ptr.offset(mem::size_of::<[i32; 4]>() as isize);
+                    ptr = ptr.add(mem::size_of::<[i32; 4]>());
                 },
             }
         }
