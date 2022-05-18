@@ -242,7 +242,7 @@ impl Context {
                     glow::TRIANGLES,
                     count as _,
                     glow::UNSIGNED_SHORT,
-                    start as _,
+                    start as i32 * 2,
                     instances as _,
                 );
             } else {
