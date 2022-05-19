@@ -7,9 +7,9 @@ use core::{ffi, mem};
 use glow::{Framebuffer, HasContext};
 
 use crate::{
-    Buffer, BufferKind, BufferLayout, BufferUsage, Image, ImageFilter, ImageFormat, ImageUniform,
-    ImageWrap, PassAction, Pipeline, PipelineInternal, Shader, Uniform, UniformFormat,
-    VertexAttribute,
+    gl_blend_factor, gl_blend_op, BlendState, Buffer, BufferKind, BufferLayout, BufferUsage, Image,
+    ImageFilter, ImageFormat, ImageUniform, ImageWrap, PassAction, Pipeline, PipelineInternal,
+    Shader, Uniform, UniformFormat, VertexAttribute,
 };
 
 pub(crate) struct ContextState {
@@ -303,6 +303,29 @@ impl Context {
     pub fn set_viewport(&self, x: u32, y: u32, width: u32, height: u32) {
         unsafe {
             self.inner.viewport(x as _, y as _, width as _, height as _);
+        }
+    }
+
+    pub fn set_blend(&self, state: BlendState) {
+        unsafe {
+            self.inner.enable(glow::BLEND);
+            self.inner.blend_equation(gl_blend_op(state.op));
+            self.inner
+                .blend_func(gl_blend_factor(state.source), gl_blend_factor(state.dest));
+        }
+    }
+
+    pub fn set_blend_separate(&self, color: BlendState, alpha: BlendState) {
+        unsafe {
+            self.inner.enable(glow::BLEND);
+            self.inner
+                .blend_equation_separate(gl_blend_op(color.op), gl_blend_op(alpha.op));
+            self.inner.blend_func_separate(
+                gl_blend_factor(color.source),
+                gl_blend_factor(color.dest),
+                gl_blend_factor(alpha.source),
+                gl_blend_factor(alpha.dest),
+            );
         }
     }
 }
