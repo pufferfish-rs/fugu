@@ -1,21 +1,27 @@
+use alloc::rc::Rc;
+
 use glow::HasContext;
 
 use crate::Context;
 
 pub struct Image {
     pub(crate) inner: glow::Texture,
+    ctx: Rc<glow::Context>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ImageFormat {
     Rgb8,
     Rgba8,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ImageFilter {
     Nearest,
     Linear,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ImageWrap {
     Clamp,
     Repeat,
@@ -75,7 +81,10 @@ impl Image {
             texture
         };
 
-        Self { inner }
+        Self {
+            inner,
+            ctx: ctx.inner.clone(),
+        }
     }
 
     pub(crate) fn with_data(
@@ -132,6 +141,17 @@ impl Image {
             texture
         };
 
-        Self { inner }
+        Self {
+            inner,
+            ctx: ctx.inner.clone(),
+        }
+    }
+}
+
+impl Drop for Image {
+    fn drop(&mut self) {
+        unsafe {
+            self.ctx.delete_texture(self.inner);
+        }
     }
 }
