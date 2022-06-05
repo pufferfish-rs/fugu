@@ -186,7 +186,7 @@ impl Image {
                 height as _,
                 self.format,
                 self.kind,
-                glow::PixelUnpackData::Slice(&data),
+                glow::PixelUnpackData::Slice(data),
             );
         }
     }

@@ -24,8 +24,8 @@
 //!   crashes or UB
 
 #![warn(missing_docs)]
-
 #![no_std]
+
 extern crate alloc;
 
 mod blend;
