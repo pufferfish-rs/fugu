@@ -18,6 +18,7 @@ pub(crate) struct ContextState {
     pub idx_buffer_set: bool,
 }
 
+/// A rendering context.
 pub struct Context {
     pub(crate) inner: Rc<glow::Context>,
     pub(crate) state: Rc<RefCell<ContextState>>,
@@ -26,6 +27,7 @@ pub struct Context {
 }
 
 impl Context {
+    /// Creates a new context from a OpenGL loader function.
     pub fn new<F>(loader_function: F) -> Self
     where
         F: FnMut(&str) -> *const ffi::c_void,
@@ -53,10 +55,12 @@ impl Context {
         }
     }
 
+    /// Creates and returns a new [`Buffer`].
     pub fn create_buffer(&self, kind: BufferKind, usage: BufferUsage, size: usize) -> Buffer {
         Buffer::new(self, kind, usage, size)
     }
 
+    /// Creates and returns a new [`Buffer`] with the given data.
     pub fn create_buffer_with_data<T>(
         &self,
         kind: BufferKind,
@@ -66,6 +70,7 @@ impl Context {
         Buffer::with_data(self, kind, usage, data)
     }
 
+    /// Creates and returns a new [`Image`].
     pub fn create_image(
         &self,
         width: u32,
@@ -77,6 +82,7 @@ impl Context {
         Image::new(self, width, height, format, filter, wrap)
     }
 
+    /// Creates and returns a new [`Image`] with the given data.
     pub fn create_image_with_data(
         &self,
         width: u32,
@@ -89,6 +95,7 @@ impl Context {
         Image::with_data(self, width, height, format, filter, wrap, data)
     }
 
+    /// Creates and returns a new [`Pipeline`].
     pub fn create_pipeline(
         &self,
         shader: Shader,
@@ -98,6 +105,10 @@ impl Context {
         Pipeline::new(self, shader, buffers, attrs)
     }
 
+    /// Creates and returns a new [`Shader`] with the given shader source.
+    ///
+    /// Shader translation based on the rendering backend must be handled by the
+    /// caller.
     pub fn create_shader(
         &self,
         vert_source: impl AsRef<[u8]>,
@@ -108,6 +119,7 @@ impl Context {
         Shader::new(self, vert_source, frag_source, uniforms, images)
     }
 
+    /// Sets the current pipeline.
     pub fn set_pipeline(&self, pipeline: &Pipeline) {
         self.state.borrow_mut().curr_pipeline = Some(pipeline.id);
         unsafe {
@@ -118,10 +130,12 @@ impl Context {
         // TODO: other stuff
     }
 
+    /// Sets the current vertex buffer.
     pub fn set_vertex_buffer(&self, buffer: &Buffer) {
         self.set_vertex_buffers(&[buffer]);
     }
 
+    /// Sets the current vertex buffers.
     pub fn set_vertex_buffers(&self, buffers: &[&Buffer]) {
         let pipeline = &self.state.borrow().pipelines[self.state.borrow().curr_pipeline.unwrap()];
         for (buffer_index, attrs) in pipeline.attrs.iter().enumerate() {
@@ -145,6 +159,7 @@ impl Context {
         }
     }
 
+    /// Sets the current index buffer.
     pub fn set_index_buffer(&self, buffer: &Buffer) {
         unsafe {
             self.inner
@@ -153,6 +168,7 @@ impl Context {
         self.state.borrow_mut().idx_buffer_set = true;
     }
 
+    /// Sets shader uniforms.
     pub fn set_uniforms<T>(&self, data: T) {
         let pipeline = &self.state.borrow().pipelines[self.state.borrow().curr_pipeline.unwrap()];
         let shader = &pipeline.shader;
@@ -220,6 +236,7 @@ impl Context {
         }
     }
 
+    /// Sets shader images.
     pub fn set_images(&self, images: &[&Image]) {
         let pipeline = &self.state.borrow().pipelines[self.state.borrow().curr_pipeline.unwrap()];
         let shader = &pipeline.shader;
@@ -235,6 +252,12 @@ impl Context {
         }
     }
 
+    /// Draws geometry from the current vertex and index buffers.
+    ///
+    /// # Arguments
+    /// * `start` - The index of the first vertex to draw.
+    /// * `count` - The number of vertices to draw.
+    /// * `instances` - The number of instances to draw.
     pub fn draw(&self, start: usize, count: usize, instances: usize) {
         unsafe {
             if self.state.borrow().idx_buffer_set {
@@ -256,6 +279,7 @@ impl Context {
         }
     }
 
+    /// Begins the default render pass with the given [`PassAction`].
     pub fn begin_default_pass(&self, action: PassAction) {
         match action {
             PassAction::Nothing => {}
@@ -282,6 +306,7 @@ impl Context {
         }
     }
 
+    /// Ends the current render pass.
     pub fn end_render_pass(&self) {
         unsafe {
             self.inner
@@ -289,6 +314,7 @@ impl Context {
         }
     }
 
+    /// Commits everything that was drawn and performs cleanup.
     pub fn commit_frame(&self) {
         unsafe {
             self.inner.bind_buffer(glow::ARRAY_BUFFER, None);
@@ -300,12 +326,14 @@ impl Context {
         self.state.borrow_mut().idx_buffer_set = false;
     }
 
+    /// Sets the viewport.
     pub fn set_viewport(&self, x: u32, y: u32, width: u32, height: u32) {
         unsafe {
             self.inner.viewport(x as _, y as _, width as _, height as _);
         }
     }
 
+    /// Sets the current blend state.
     pub fn set_blend(&self, state: BlendState) {
         unsafe {
             self.inner.enable(glow::BLEND);
@@ -315,6 +343,7 @@ impl Context {
         }
     }
 
+    /// Sets the current blend state separately for color and alpha.
     pub fn set_blend_separate(&self, color: BlendState, alpha: BlendState) {
         unsafe {
             self.inner.enable(glow::BLEND);

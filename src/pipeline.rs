@@ -5,6 +5,8 @@ use glow::HasContext;
 
 use super::{Context, Shader};
 
+/// Step functions for a vertex attribute.
+#[allow(missing_docs)]
 #[derive(Clone, Copy, Debug)]
 pub enum VertexStep {
     PerVertex,
@@ -17,6 +19,8 @@ impl Default for VertexStep {
     }
 }
 
+/// Formats of a vertex attribute.
+#[allow(missing_docs)]
 #[derive(Clone, Copy, Debug)]
 pub enum VertexFormat {
     Float1,
@@ -33,16 +37,23 @@ pub enum VertexFormat {
     Short4,
 }
 
+/// The layout of a buffer.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct BufferLayout {
+    /// The stride in bytes.
     pub stride: i32,
+    /// The vertex attribute step function.
     pub step_func: VertexStep,
 }
 
+/// A vertex attribute.
 #[derive(Clone, Copy, Debug)]
 pub struct VertexAttribute {
+    /// The name of the attribute.
     pub name: &'static str,
+    /// The format of the attribute.
     pub format: VertexFormat,
+    /// The buffer index.
     pub buffer_index: usize,
 }
 
@@ -56,12 +67,13 @@ pub(crate) struct VertexAttributeInternal {
     pub size: i32,
 }
 
+/// A rendering pipeline.
 #[derive(Clone, Copy, Debug)]
 pub struct Pipeline {
     pub(crate) id: usize,
 }
 
-pub struct PipelineInternal {
+pub(crate) struct PipelineInternal {
     pub(crate) attrs: Vec<Vec<VertexAttributeInternal>>,
     pub(crate) shader: Shader,
 }

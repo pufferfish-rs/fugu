@@ -1,3 +1,5 @@
+/// A blending operation.
+#[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BlendOp {
     Add,
@@ -5,6 +7,8 @@ pub enum BlendOp {
     ReverseSubtract,
 }
 
+/// A blending factor.
+#[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BlendFactor {
     Zero,
@@ -19,10 +23,14 @@ pub enum BlendFactor {
     OneMinusDestAlpha,
 }
 
+/// A blend equation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BlendState {
+    /// The blending operation.
     pub op: BlendOp,
+    /// The source blending factor.
     pub source: BlendFactor,
+    /// The destination blending factor.
     pub dest: BlendFactor,
 }
 

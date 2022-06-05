@@ -6,6 +6,7 @@ use glow::HasContext;
 
 use super::Context;
 
+/// A shader.
 pub struct Shader {
     pub(crate) inner: glow::Program,
     pub(crate) uniforms: Vec<UniformInternal>,
@@ -13,8 +14,11 @@ pub struct Shader {
     ctx: Rc<glow::Context>,
 }
 
+/// A shader uniform.
 pub struct Uniform {
+    /// The name of the uniform.
     pub name: &'static str,
+    /// The format of the uniform.
     pub format: UniformFormat,
 }
 
@@ -23,7 +27,9 @@ pub(crate) struct UniformInternal {
     pub format: UniformFormat,
 }
 
+/// An image uniform.
 pub struct ImageUniform {
+    /// The name of the uniform.
     pub name: &'static str,
 }
 
@@ -31,6 +37,8 @@ pub(crate) struct ImageUniformInternal {
     pub location: glow::UniformLocation,
 }
 
+/// Formats of a shader uniform.
+#[allow(missing_docs)]
 #[derive(Clone, Copy, Debug)]
 pub enum UniformFormat {
     Float1,

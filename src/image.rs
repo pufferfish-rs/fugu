@@ -4,6 +4,7 @@ use glow::HasContext;
 
 use crate::Context;
 
+/// A GPU image.
 pub struct Image {
     pub(crate) inner: glow::Texture,
     width: u32,
@@ -13,21 +14,29 @@ pub struct Image {
     ctx: Rc<glow::Context>,
 }
 
+/// Formats of a GPU image.
+#[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ImageFormat {
     Rgb8,
     Rgba8,
 }
 
+/// Filter modes for a GPU image.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ImageFilter {
+    /// Nearest neighbor interpolation.
     Nearest,
+    /// Linear interpolation.
     Linear,
 }
 
+/// Wrapping modes for a GPU image.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ImageWrap {
+    /// Clamps sampling to the bounds of the image.
     Clamp,
+    /// Repeats the image.
     Repeat,
 }
 
@@ -159,10 +168,12 @@ impl Image {
         }
     }
 
+    /// Updates the contents of the image.
     pub fn update(&self, data: &[u8]) {
         self.update_part(0, 0, self.width, self.height, data);
     }
 
+    /// Updates the contents of a part of the image.
     pub fn update_part(&self, x: u32, y: u32, width: u32, height: u32, data: &[u8]) {
         unsafe {
             self.ctx.bind_texture(glow::TEXTURE_2D, Some(self.inner));

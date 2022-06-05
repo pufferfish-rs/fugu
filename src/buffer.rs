@@ -6,19 +6,29 @@ use glow::HasContext;
 
 use super::Context;
 
+/// Kinds of a GPU buffer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BufferKind {
+    /// A vertex buffer.
     Vertex,
+    /// An index buffer.
     Index,
 }
 
+/// Usage hints for a GPU buffer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BufferUsage {
+    /// The contents of the buffer will be set once and then used many times.
     Static,
+    /// The contents of the buffer will be modified repeatedly and then used
+    /// many times.
     Dynamic,
+    /// The contents of the buffer will be modified repeatedly and then used at
+    /// most a few times.
     Stream,
 }
 
+/// A GPU buffer.
 pub struct Buffer {
     pub(crate) inner: glow::Buffer,
     pub(crate) kind: BufferKind,
@@ -93,6 +103,7 @@ impl Buffer {
         }
     }
 
+    /// Updates the contents of the buffer with the given data.
     pub fn update<T>(&self, data: &[T]) {
         let size = mem::size_of_val(data);
         assert!(
@@ -112,6 +123,7 @@ impl Buffer {
         }
     }
 
+    /// Returns the size of the buffer in bytes.
     pub fn size(&self) -> usize {
         self.size
     }

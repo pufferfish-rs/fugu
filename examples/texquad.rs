@@ -16,7 +16,7 @@ struct Vertex {
 
 fn main() {
     let el = EventLoop::new();
-    let wb = WindowBuilder::new().with_title("Textured quad");
+    let wb = WindowBuilder::new().with_title("Textured Quad");
 
     let windowed_context = ContextBuilder::new().build_windowed(wb, &el).unwrap();
 

@@ -12,7 +12,7 @@ struct Vertex {
 
 fn main() {
     let el = EventLoop::new();
-    let wb = WindowBuilder::new().with_title("Hello triangle");
+    let wb = WindowBuilder::new().with_title("Hello Triangle");
 
     let windowed_context = ContextBuilder::new().build_windowed(wb, &el).unwrap();
 
